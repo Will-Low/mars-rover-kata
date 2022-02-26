@@ -76,6 +76,51 @@ impl RoverData {
             orientation,
         }
     }
+
+    fn rotate_left(&self) -> RoverData {
+        let position = self.position.clone();
+        let orientation = {
+            use Orientation::*;
+            match self.orientation {
+                North => West,
+                West => South,
+                South => East,
+                East => North,
+            }
+        };
+
+        RoverData {
+            position,
+            orientation,
+        }
+    }
+
+    fn forward(&self) -> RoverData {
+        let position = {
+            use Orientation::*;
+            match self.orientation {
+                North => Position {
+                    x: self.position.x,
+                    y: self.position.y + 1,
+                },
+                East => Position {
+                    x: self.position.x + 1,
+                    y: self.position.y,
+                },
+                South => Position {
+                    x: self.position.x,
+                    y: self.position.y - 1,
+                },
+                _ => todo!(),
+            }
+        };
+        let orientation = self.orientation.clone();
+
+        RoverData {
+            position,
+            orientation,
+        }
+    }
 }
 
 fn plot(location: RoverData, commands: &[char]) -> RoverData {
@@ -87,6 +132,8 @@ fn plot(location: RoverData, commands: &[char]) -> RoverData {
 fn handle_command(location: RoverData, command: &char) -> RoverData {
     match command {
         'R' => location.rotate_right(),
+        'L' => location.rotate_left(),
+        'M' => location.forward(),
         _ => todo!(),
     }
 }
@@ -105,74 +152,4 @@ pub fn execute(command_str: &str) -> String {
     let starting_location = RoverData::new();
     let final_location = plot(starting_location, &commands);
     String::from(final_location)
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn new_rover_in_default_position() {
-        assert_eq!(
-            RoverData::new(),
-            RoverData {
-                position: Position::new(),
-                orientation: Orientation::new()
-            }
-        );
-    }
-
-    #[test]
-    fn rover_rotates_right() {
-        let rover_data = RoverData::new();
-
-        assert_eq!(
-            rover_data.rotate_right(),
-            RoverData {
-                position: Position::new(),
-                orientation: Orientation::East
-            }
-        );
-
-        assert_eq!(
-            rover_data.rotate_right().rotate_right(),
-            RoverData {
-                position: Position::new(),
-                orientation: Orientation::South
-            }
-        );
-
-        assert_eq!(
-            rover_data.rotate_right().rotate_right().rotate_right(),
-            RoverData {
-                position: Position::new(),
-                orientation: Orientation::West
-            }
-        );
-
-        assert_eq!(
-            rover_data
-                .rotate_right()
-                .rotate_right()
-                .rotate_right()
-                .rotate_right(),
-            RoverData {
-                position: Position::new(),
-                orientation: Orientation::North
-            }
-        );
-    }
-
-    // #[test]
-    // fn rover_rotate_left() {
-    //     let rover_data = RoverData::new();
-    //
-    //     assert_eq!(
-    //         rover_data.rotate_left(),
-    //         RoverData {
-    //             position: Position::new(),
-    //             orientation: Orientation::West
-    //         }
-    //     );
-    // }
 }

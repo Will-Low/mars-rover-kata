@@ -1,5 +1,5 @@
 [package]
-name = "mars-rover-kata-rust"
+name = "mars-rover"
 version = "0.1.0"
 edition = "2021"
 
