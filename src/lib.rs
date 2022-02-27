@@ -2,18 +2,6 @@ use std::fmt;
 use std::fmt::Formatter;
 
 #[derive(Clone, Debug, PartialEq)]
-struct Position {
-    x: u64,
-    y: u64,
-}
-
-impl Position {
-    fn new() -> Self {
-        Position { x: 0, y: 0 }
-    }
-}
-
-#[derive(Clone, Debug, PartialEq)]
 enum Orientation {
     North,
     South,
@@ -42,6 +30,18 @@ impl From<&Orientation> for String {
             East => "E".to_string(),
             West => "W".to_string(),
         }
+    }
+}
+
+#[derive(Clone, Debug, PartialEq)]
+struct Position {
+    x: u64,
+    y: u64,
+}
+
+impl Position {
+    fn new() -> Self {
+        Position { x: 0, y: 0 }
     }
 }
 
