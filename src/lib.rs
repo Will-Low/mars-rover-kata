@@ -46,20 +46,20 @@ impl Position {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-struct RoverData {
+struct Rover {
     position: Position,
     orientation: Orientation,
 }
 
-impl RoverData {
+impl Rover {
     fn new() -> Self {
-        RoverData {
+        Rover {
             position: Position::new(),
             orientation: Orientation::new(),
         }
     }
 
-    fn rotate_right(&self) -> RoverData {
+    fn rotate_right(&self) -> Rover {
         let position = self.position.clone();
         let orientation = {
             use Orientation::*;
@@ -71,13 +71,13 @@ impl RoverData {
             }
         };
 
-        RoverData {
+        Rover {
             position,
             orientation,
         }
     }
 
-    fn rotate_left(&self) -> RoverData {
+    fn rotate_left(&self) -> Rover {
         let position = self.position.clone();
         let orientation = {
             use Orientation::*;
@@ -89,57 +89,111 @@ impl RoverData {
             }
         };
 
-        RoverData {
+        Rover {
             position,
             orientation,
         }
     }
 
-    fn forward(&self) -> RoverData {
+    fn forward(&self, grid: &Grid) -> Rover {
         let position = {
             use Orientation::*;
             match self.orientation {
-                North => Position {
-                    x: self.position.x,
-                    y: self.position.y + 1,
-                },
-                East => Position {
-                    x: self.position.x + 1,
-                    y: self.position.y,
-                },
-                South => Position {
-                    x: self.position.x,
-                    y: self.position.y - 1,
-                },
-                _ => todo!(),
+                North => {
+                    if grid.height == self.position.y + 1 {
+                        Position {
+                            x: self.position.x,
+                            y: 0,
+                        }
+                    } else {
+                        Position {
+                            x: self.position.x,
+                            y: self.position.y + 1,
+                        }
+                    }
+                }
+                East => {
+                    if grid.width == self.position.x + 1 {
+                        Position {
+                            x: 0,
+                            y: self.position.y,
+                        }
+                    } else {
+                        Position {
+                            x: self.position.x + 1,
+                            y: self.position.y,
+                        }
+                    }
+                }
+                South => {
+                    if self.position.y.checked_sub(1).is_none() {
+                        Position {
+                            x: self.position.x,
+                            y: grid.height - 1,
+                        }
+                    } else {
+                        Position {
+                            x: self.position.x,
+                            y: self.position.y - 1,
+                        }
+                    }
+                }
+                West => {
+                    if self.position.x.checked_sub(1).is_none() {
+                        Position {
+                            x: 9,
+                            y: self.position.y,
+                        }
+                    } else {
+                        Position {
+                            x: self.position.x - 1,
+                            y: self.position.y,
+                        }
+                    }
+                }
             }
         };
         let orientation = self.orientation.clone();
 
-        RoverData {
+        Rover {
             position,
             orientation,
         }
     }
 }
 
-fn plot(location: RoverData, commands: &[char]) -> RoverData {
+fn plot(location: Rover, commands: &[char]) -> Rover {
     commands
         .iter()
         .fold(location, |new_location, c| handle_command(new_location, c))
 }
 
-fn handle_command(location: RoverData, command: &char) -> RoverData {
+fn plot_with_grid(location: Rover, commands: &[char], grid: &Grid) -> Rover {
+    commands
+        .iter()
+        .fold(location, |new_location, c| handle_command(new_location, c))
+}
+
+fn handle_command(location: Rover, command: &char) -> Rover {
     match command {
         'R' => location.rotate_right(),
         'L' => location.rotate_left(),
-        'M' => location.forward(),
+        'M' => location.forward(&Grid::new(10, 10)),
         _ => todo!(),
     }
 }
 
-impl From<RoverData> for String {
-    fn from(location: RoverData) -> Self {
+fn handle_command_grid(rover: Rover, grid: &Grid, command: &char) -> Rover {
+    match command {
+        'R' => rover.rotate_right(),
+        'L' => rover.rotate_left(),
+        'M' => rover.forward(grid),
+        _ => todo!(),
+    }
+}
+
+impl From<Rover> for String {
+    fn from(location: Rover) -> Self {
         let x = location.position.x;
         let y = location.position.y;
         let orientation = location.orientation;
@@ -147,9 +201,28 @@ impl From<RoverData> for String {
     }
 }
 
+pub struct Grid {
+    width: u64,
+    height: u64,
+}
+
+impl Grid {
+    pub fn new(width: u64, height: u64) -> Self {
+        Grid { width, height }
+    }
+
+    pub fn execute(&self, command_str: &str) -> String {
+        let commands: Vec<char> = command_str.chars().collect();
+        let starting_location = Rover::new();
+        let final_location = plot_with_grid(starting_location, &commands, self);
+        String::from(final_location)
+    }
+}
+
+#[deprecated(note = "Use Grid.execute() instead")]
 pub fn execute(command_str: &str) -> String {
     let commands: Vec<char> = command_str.chars().collect();
-    let starting_location = RoverData::new();
+    let starting_location = Rover::new();
     let final_location = plot(starting_location, &commands);
     String::from(final_location)
 }

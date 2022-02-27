@@ -1,4 +1,5 @@
 use mars_rover::execute;
+use mars_rover::Grid;
 
 #[test]
 fn rover_starts_at_0_0_facing_north() {
@@ -60,10 +61,26 @@ fn rover_moves_south_and_wraps_around() {
     assert_eq!(execute("RRM"), "0:9:S");
 }
 
+#[test]
+fn rover_moves_north_and_wraps_around() {
+    assert_eq!(execute("MMMMMMMMMMM"), "0:1:N");
+}
+
+#[test]
+fn rover_moves_east_and_wraps_around() {
+    assert_eq!(execute("RMMMMMMMMMMM"), "1:0:E");
+}
+
+#[test]
+fn rover_moves_west_and_wraps_around() {
+    assert_eq!(execute("LM"), "9:0:W");
+}
+
 /*
    TODO
    [ ] Top wraparound
    [ ] Bottom wraparound
    [ ] Right wraparound
    [ ] Left wraparound
+   [ ] 0 sized grid
 */
