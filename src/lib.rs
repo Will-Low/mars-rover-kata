@@ -99,58 +99,10 @@ impl Rover {
         let position = {
             use Orientation::*;
             match self.orientation {
-                North => {
-                    if grid.height == self.position.y + 1 {
-                        Position {
-                            x: self.position.x,
-                            y: 0,
-                        }
-                    } else {
-                        Position {
-                            x: self.position.x,
-                            y: self.position.y + 1,
-                        }
-                    }
-                }
-                East => {
-                    if grid.width == self.position.x + 1 {
-                        Position {
-                            x: 0,
-                            y: self.position.y,
-                        }
-                    } else {
-                        Position {
-                            x: self.position.x + 1,
-                            y: self.position.y,
-                        }
-                    }
-                }
-                South => {
-                    if self.position.y.checked_sub(1).is_none() {
-                        Position {
-                            x: self.position.x,
-                            y: grid.height - 1,
-                        }
-                    } else {
-                        Position {
-                            x: self.position.x,
-                            y: self.position.y - 1,
-                        }
-                    }
-                }
-                West => {
-                    if self.position.x.checked_sub(1).is_none() {
-                        Position {
-                            x: 9,
-                            y: self.position.y,
-                        }
-                    } else {
-                        Position {
-                            x: self.position.x - 1,
-                            y: self.position.y,
-                        }
-                    }
-                }
+                North => self.move_north(grid),
+                East => self.move_east(grid),
+                South => self.move_south(grid),
+                West => self.move_west(grid),
             }
         };
         let orientation = self.orientation.clone();
@@ -158,6 +110,62 @@ impl Rover {
         Rover {
             position,
             orientation,
+        }
+    }
+
+    fn move_west(&self, grid: &Grid) -> Position {
+        if self.position.x.checked_sub(1).is_none() {
+            Position {
+                x: grid.width - 1,
+                y: self.position.y,
+            }
+        } else {
+            Position {
+                x: self.position.x - 1,
+                y: self.position.y,
+            }
+        }
+    }
+
+    fn move_south(&self, grid: &Grid) -> Position {
+        if self.position.y.checked_sub(1).is_none() {
+            Position {
+                x: self.position.x,
+                y: grid.height - 1,
+            }
+        } else {
+            Position {
+                x: self.position.x,
+                y: self.position.y - 1,
+            }
+        }
+    }
+
+    fn move_east(&self, grid: &Grid) -> Position {
+        if grid.width == self.position.x + 1 {
+            Position {
+                x: 0,
+                y: self.position.y,
+            }
+        } else {
+            Position {
+                x: self.position.x + 1,
+                y: self.position.y,
+            }
+        }
+    }
+
+    fn move_north(&self, grid: &Grid) -> Position {
+        if grid.height == self.position.y + 1 {
+            Position {
+                x: self.position.x,
+                y: 0,
+            }
+        } else {
+            Position {
+                x: self.position.x,
+                y: self.position.y + 1,
+            }
         }
     }
 }
@@ -193,6 +201,8 @@ pub struct Grid {
 
 impl Grid {
     pub fn new(width: u64, height: u64) -> Self {
+        assert!(width > 0, "Cannot have a grid with a width of 0");
+        assert!(height > 0, "Cannot have a grid with a height of 0");
         Grid { width, height }
     }
 
