@@ -162,33 +162,18 @@ impl Rover {
     }
 }
 
-fn plot(location: Rover, commands: &[char]) -> Rover {
-    commands
-        .iter()
-        .fold(location, |new_location, c| handle_command(new_location, c))
+fn plot(location: Rover, grid: &Grid, commands: &[char]) -> Rover {
+    commands.iter().fold(location, |new_location, c| {
+        handle_command(new_location, grid, c)
+    })
 }
 
-fn plot_with_grid(location: Rover, commands: &[char], grid: &Grid) -> Rover {
-    commands
-        .iter()
-        .fold(location, |new_location, c| handle_command(new_location, c))
-}
-
-fn handle_command(location: Rover, command: &char) -> Rover {
-    match command {
-        'R' => location.rotate_right(),
-        'L' => location.rotate_left(),
-        'M' => location.forward(&Grid::new(10, 10)),
-        _ => todo!(),
-    }
-}
-
-fn handle_command_grid(rover: Rover, grid: &Grid, command: &char) -> Rover {
+fn handle_command(rover: Rover, grid: &Grid, command: &char) -> Rover {
     match command {
         'R' => rover.rotate_right(),
         'L' => rover.rotate_left(),
         'M' => rover.forward(grid),
-        _ => todo!(),
+        _ => unimplemented!(),
     }
 }
 
@@ -214,15 +199,7 @@ impl Grid {
     pub fn execute(&self, command_str: &str) -> String {
         let commands: Vec<char> = command_str.chars().collect();
         let starting_location = Rover::new();
-        let final_location = plot_with_grid(starting_location, &commands, self);
+        let final_location = plot(starting_location, self, &commands);
         String::from(final_location)
     }
-}
-
-#[deprecated(note = "Use Grid.execute() instead")]
-pub fn execute(command_str: &str) -> String {
-    let commands: Vec<char> = command_str.chars().collect();
-    let starting_location = Rover::new();
-    let final_location = plot(starting_location, &commands);
-    String::from(final_location)
 }
