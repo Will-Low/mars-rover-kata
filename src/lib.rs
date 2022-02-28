@@ -59,6 +59,12 @@ impl Rover {
         }
     }
 
+    fn plot(self, grid: &Grid, commands: &[char]) -> Rover {
+        commands.iter().fold(self, |new_location, c| {
+            handle_command(new_location, grid, c)
+        })
+    }
+
     fn rotate_right(&self) -> Rover {
         let position = self.position.clone();
         let orientation = {
@@ -170,12 +176,6 @@ impl Rover {
     }
 }
 
-fn plot(location: Rover, grid: &Grid, commands: &[char]) -> Rover {
-    commands.iter().fold(location, |new_location, c| {
-        handle_command(new_location, grid, c)
-    })
-}
-
 fn handle_command(rover: Rover, grid: &Grid, command: &char) -> Rover {
     match command {
         'R' => rover.rotate_right(),
@@ -208,8 +208,8 @@ impl Grid {
 
     pub fn execute(&self, command_str: &str) -> String {
         let commands: Vec<char> = command_str.chars().collect();
-        let starting_location = Rover::new();
-        let final_location = plot(starting_location, self, &commands);
+        let rover = Rover::new();
+        let final_location = rover.plot(self, &commands);
         String::from(final_location)
     }
 }
