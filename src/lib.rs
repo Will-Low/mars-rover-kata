@@ -181,7 +181,7 @@ fn handle_command(rover: Rover, grid: &Grid, command: &char) -> Rover {
         'R' => rover.rotate_right(),
         'L' => rover.rotate_left(),
         'M' => rover.forward(grid),
-        _ => unimplemented!(),
+        _ => panic!("Unsupported command"),
     }
 }
 

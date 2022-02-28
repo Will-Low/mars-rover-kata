@@ -130,3 +130,10 @@ fn grid_of_height_zero_not_allowed() {
 fn grid_of_width_zero_not_allowed() {
     Grid::new(0, 1);
 }
+
+#[test]
+#[should_panic]
+fn unsupported_command() {
+    let grid = ten_by_ten_grid();
+    grid.execute("BADCOMMAND");
+}
